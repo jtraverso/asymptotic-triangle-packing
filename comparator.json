@@ -1,0 +1,12 @@
+{
+  "challenge_module": "Challenge",
+  "solution_module": "Solution",
+  "theorem_names": [
+    "AsymptoticTrianglePacking.near_regular_nibble",
+    "AsymptoticTrianglePacking.fractional_triangle_packing_gap",
+    "AsymptoticTrianglePacking.triangle_cover_packing_gap"
+  ],
+  "definition_names": [],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
+  "enable_nanoda": true
+}

@@ -1,0 +1,184 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "Near-regular hypergraph matchings and the asymptotic triangle-packing gap"
+  description: >-
+    A Lean 4 / Mathlib formalization of three results. (1) A finite nibble theorem: r-uniform
+    hypergraphs whose degrees are at most (1+μ)d everywhere and at least (1−μ)d outside an
+    exceptional set of at most η|V| vertices, with codegrees at most μd, have matchings with at
+    least (1−β)|V|/r edges. (2) The fractional–integral triangle-packing gap is o(n²) uniformly
+    over finite graphs: every large graph has an edge-disjoint triangle family P such that every
+    fractional triangle packing has weight at most |P| + εn² (the triangle case of Haxell–Rödl).
+    (3) The cover form: a fractional triangle cover of weight at most |P| + εn² exists. The proof
+    combines a nibble with second-moment and Freedman-type concentration, a low-degree core
+    reduction, Mathlib's Szemerédi regularity lemma with a cluster linear program rounded by
+    explicit designs, and LP duality.
+  authors:
+    - "Juan Pablo Traverso Gianini"
+  license: "Apache-2.0"
+  responsible_maintainers:
+    - "Juan Pablo Traverso Gianini"
+
+classification:
+  arxiv: ["math.CO"]
+  msc2020: ["05C70", "05C35", "05C65"]
+
+sources:
+  - title: "Integer and fractional packings in dense graphs"
+    authors:
+      - "P. E. Haxell"
+      - "V. Rödl"
+    id: "doi:10.1007/s004930170003"
+    type: "paper"
+    location: "Combinatorica 21 (2001), no. 1, 13–38"
+    relationship: "formalizes"
+    note: "Statement (2) is the triangle case of the main theorem (ν*_F(G) − ν_F(G) = o(n²)); the formal proof follows its own route (see the description), not the paper's."
+    license: "unknown"
+    author_endorsement: "not-contacted"
+  - title: "Integer and fractional packing of families of graphs"
+    authors:
+      - "Raphael Yuster"
+    id: "doi:10.1002/rsa.20048"
+    type: "paper"
+    location: "Random Structures & Algorithms 26 (2005), no. 1–2, 110–118"
+    relationship: "background"
+    note: "Extension of Haxell–Rödl to families of graphs; the triangle hypergraph on the edge set used here follows this presentation."
+    license: "unknown"
+    author_endorsement: "not-contacted"
+  - title: "Near perfect coverings in graphs and hypergraphs"
+    authors:
+      - "P. Frankl"
+      - "V. Rödl"
+    id: "doi:10.1016/S0195-6698(85)80045-7"
+    type: "paper"
+    location: "European Journal of Combinatorics 6 (1985), no. 4, 317–326"
+    relationship: "background"
+    note: "Origin of the nibble method for near-perfect matchings in near-regular hypergraphs; statement (1) is a variant with an exceptional set and a global degree ceiling."
+    license: "unknown"
+    author_endorsement: "not-contacted"
+  - title: "Asymptotic behavior of the chromatic index for hypergraphs"
+    authors:
+      - "Nicholas Pippenger"
+      - "Joel Spencer"
+    id: "doi:10.1016/0097-3165(89)90074-5"
+    type: "paper"
+    location: "Journal of Combinatorial Theory, Series A 51 (1989), no. 1, 24–42"
+    relationship: "background"
+    note: "Codegree form of the nibble theorem (near-regular hypergraphs with small codegrees have near-perfect matchings)."
+    license: "unknown"
+    author_endorsement: "not-contacted"
+  - title: "Linear-Error Clique Partitions of Split Graphs via Structured Triangle Packing (Paper III of the preprint series)"
+    authors:
+      - "Juan Pablo Traverso Gianini"
+    id: "https://github.com/jtraverso/erdos-81-chordal-clique-partitions/tree/main/preprints/PAPER_III"
+    type: "preprint"
+    location: "GitHub repository jtraverso/erdos-81-chordal-clique-partitions, preprints/PAPER_III"
+    relationship: "other"
+    note: "The author's preprint for which this Lean development (the asymptotic triangle cover–packing gap, AX1) was built."
+    license: "unknown"
+    author_endorsement: "participated"
+
+related_formalizations:
+  - id: "LeanPool/lean-pool, project AsymptoticTrianglePacking (PRs #544 and #471)"
+    relationship: "builds-on"
+    note: >-
+      The same author's contribution to Lean Pool. The modules under LeanPool/ are copied from
+      LeanPool/lean-pool at commit 26ce45d3871e5560a8baffa4d49a8942b1d20a24 (without the
+      generated aggregate `Imports.lean`); only the copyright and author header lines were
+      normalized to the maintainer's name. Challenge.lean and Solution.lean were added for this
+      submission.
+
+status:
+  scope: >-
+    Proved for every finite vertex type: statement (1) for every uniformity r ≥ 2 and every
+    β > 0; statements (2) and (3) for every ε > 0, uniformly over all finite simple graphs with
+    decidable adjacency on at least n₀(ε) vertices.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: []
+
+automation:
+  methods:
+    - method: "autonomous"
+      models: ["Aristotle (Harmonic)"]
+      framework: "Aristotle CLI"
+      tool_setup: >-
+        Produced Lean proofs of the development from the author's statements and proof plans
+        while it was built for the author's Paper III; the returns were audited and rebuilt.
+      cost:
+        wall_time: "not tracked"
+        spend_usd: "not tracked"
+        hardware: "API-only"
+      prompting_notes: "Formal statements and proof plans supplied by the author."
+    - method: "agent"
+      models: ["Claude Opus 5.5"]
+      framework: "Claude Code (Anthropic)"
+      tool_setup: >-
+        Port review and the Palomar packaging (Challenge with self-contained definitions,
+        Solution with the bridges to the library statements, comparator configuration,
+        metadata), checked with `lake build` and `#print axioms` (Lean v4.35.0-rc3, Mathlib
+        c55e6e786f49471c72fbddbec5415808896aec1e).
+      cost:
+        wall_time: "a few hours"
+        spend_usd: "subscription-based"
+        hardware: "local machine"
+      prompting_notes: "Natural-language instructions in Spanish, directed by the author."
+  spend_usd: "subscription-based"
+  notes: >-
+    The results and the route were chosen by the human author; the Lean proofs are AI-generated
+    and mechanically verified (no `sorry`, axioms limited to propext, Classical.choice and
+    Quot.sound, identical elaborated types for the Challenge/Solution pair).
+
+fidelity:
+  divergences: >-
+    Statement (1) is a variant of the classical nibble theorem: low degrees are allowed on an
+    exceptional set of at most η|V| vertices, but the upper bound (1+μ)d is required at every
+    vertex; the conclusion counts matching edges against |V|/r. Statements (2) and (3) are given
+    existentially instead of through optimum values: instead of ν*(G) − ν(G) ≤ εn² (resp.
+    τ*(G) − ν(G) ≤ εn²) they assert an edge-disjoint triangle family P with every fractional
+    packing of weight at most |P| + εn² (resp. some fractional cover of weight at most
+    |P| + εn²), which is equivalent. Triangles are the 3-cliques of G; two triangles are
+    edge-disjoint when they share at most one vertex; fractional packings put nonnegative
+    weights on vertex sets, only weights of triangles enter the sums, and every edge receives
+    total weight at most one; fractional covers put nonnegative weights on unordered pairs, and
+    every triangle receives total weight at least one from the edges of G inside it.
+
+review:
+  status: "agent-reviewed"
+  reviewers:
+    - "Claude Opus 5.5 (AI agent in Claude Code, acting for the author)"
+  notes: >-
+    Agent review by Claude Opus 5.5, distinct from the mechanical verification. The agent
+    compared the Challenge statements with the classical results (Haxell–Rödl for triangles;
+    the Frankl–Rödl / Pippenger–Spencer nibble) and recorded the differences above. It checked
+    that the vendored modules are the merged Lean Pool sources up to the normalized header lines.
+    It wrote and checked the bridges in Solution.lean (realization of ν₃ by an edge-disjoint
+    family, approximation of the infimum τ₃*, weak duality), and confirmed by `lake build`,
+    `#print axioms` and a comparison of the fully elaborated Challenge and Solution types that
+    the proofs use no `sorry` and only propext, Classical.choice and Quot.sound. The author
+    directed the work and approved the statements. No independent human mathematical review has
+    been performed. Statements (2) and (3) are known results (Haxell–Rödl); the nibble variant
+    (1) is stated in the form used by the author's Paper III.
+
+alignment:
+  namespace: "AsymptoticTrianglePacking"
+  statements:
+    - source: "Nibble theorem (Frankl–Rödl, Pippenger–Spencer), variant with exceptional set and degree ceiling"
+      lean: "AsymptoticTrianglePacking.near_regular_nibble"
+      module: "Challenge"
+      status: "proved"
+      note: "Near-regular uniform hypergraphs with small codegrees have near-perfect matchings."
+    - source: "Haxell–Rödl (2001), main theorem, F = K3"
+      lean: "AsymptoticTrianglePacking.fractional_triangle_packing_gap"
+      module: "Challenge"
+      status: "proved"
+      note: "ν*(G) − ν(G) = o(n²) for triangles, uniformly over finite graphs."
+    - source: "Haxell–Rödl (2001) with LP duality, cover form"
+      lean: "AsymptoticTrianglePacking.triangle_cover_packing_gap"
+      module: "Challenge"
+      status: "proved"
+      note: "τ*(G) − ν(G) = o(n²) for triangles, uniformly over finite graphs."
+
+acknowledgements: >-
+  Mathlib and the Lean community; Harmonic's Aristotle; Lean Pool.
