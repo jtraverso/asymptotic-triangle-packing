@@ -2,7 +2,7 @@
 
 Author and maintainer: **Juan Pablo Traverso Gianini**. Licence: Apache-2.0 (see `LICENSE`).
 
-This repository formalizes three results.
+This repository formalizes four results.
 
 1. **A finite near-regular nibble theorem.** For every `r ≥ 2` and `β > 0` there are
    `μ, η, d₀ > 0` with the following property. Let `H` be an `r`-uniform hypergraph on a finite
@@ -22,6 +22,12 @@ This repository formalizes three results.
 3. **Fractional triangle cover vs. integral packing.** For every `ε > 0`, every large enough finite
    graph on `n` vertices has a family `P` of edge-disjoint triangles and a fractional triangle
    cover of total weight at most `|P| + ε n²`. That is, `τ*(G) − ν(G) = o(n²)`.
+4. **Approximate decompositions from fractional ones** (version 2). For every `η > 0`, every large
+   enough finite graph on `n` vertices that has a fractional triangle decomposition (weights on
+   its triangles summing to exactly one at every edge) has a family of edge-disjoint triangles
+   covering all but at most `η n²` of its edges. This is the form of Haxell–Rödl used to pass
+   from fractional to integral decompositions, e.g. Theorem 1.5 of Barber–Kühn–Lo–Osthus–Taylor
+   (2017) for `r = 3`.
 
 The audited statements are in [`Challenge.lean`](Challenge.lean), which imports only Mathlib. The
 proofs are in [`Solution.lean`](Solution.lean). Supporting files:
@@ -51,6 +57,10 @@ proofs are in [`Solution.lean`](Solution.lean). Supporting files:
   - a maximum edge-disjoint family realizes `ν`, and a cover within `ε n² / 2` of the infimum
     `τ*` exists;
   - weak duality between fractional packings and covers.
+* **Transfer form (version 2).** A fractional triangle decomposition is a fractional packing of
+  total weight `e(G) / 3` (each triangle has three edges; double counting), and the triangles of
+  an edge-disjoint family `P` cover exactly `3 |P|` edges. Applying the gap with `η / 3` leaves at
+  most `η n²` uncovered edges. This is in `Solution.lean`.
 
 The modules under `LeanPool/` are the author's contribution to
 [Lean Pool](https://github.com/LeanPool/lean-pool) (PRs #544 and #471). They are copied from
@@ -67,6 +77,9 @@ lines normalized to the maintainer's name.
   (1985) 317–326, doi:10.1016/S0195-6698(85)80045-7.
 * N. Pippenger, J. Spencer, *Asymptotic behavior of the chromatic index for hypergraphs*, J.
   Combin. Theory Ser. A 51 (1989) 24–42, doi:10.1016/0097-3165(89)90074-5.
+* B. Barber, D. Kühn, A. Lo, D. Osthus, A. Taylor, *Clique decompositions of multipartite graphs
+  and completion of Latin squares*, J. Combin. Theory Ser. A 151 (2017) 146–201,
+  doi:10.1016/j.jcta.2017.04.005 (Theorem 1.5: the transfer form of statement 4).
 * J. P. Traverso Gianini, Paper III of the preprint series
   [erdos-81-chordal-clique-partitions](https://github.com/jtraverso/erdos-81-chordal-clique-partitions/tree/main/preprints/PAPER_III).
   This Lean development was built for it.

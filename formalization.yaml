@@ -4,13 +4,17 @@ version: "v0.4"
 project:
   name: "Near-regular hypergraph matchings and the asymptotic triangle-packing gap"
   description: >-
-    A Lean 4 / Mathlib formalization of three results. (1) A finite nibble theorem: r-uniform
+    A Lean 4 / Mathlib formalization of four results. (1) A finite nibble theorem: r-uniform
     hypergraphs whose degrees are at most (1+μ)d everywhere and at least (1−μ)d outside an
     exceptional set of at most η|V| vertices, with codegrees at most μd, have matchings with at
     least (1−β)|V|/r edges. (2) The fractional–integral triangle-packing gap is o(n²) uniformly
     over finite graphs: every large graph has an edge-disjoint triangle family P such that every
     fractional triangle packing has weight at most |P| + εn² (the triangle case of Haxell–Rödl).
-    (3) The cover form: a fractional triangle cover of weight at most |P| + εn² exists. The proof
+    (3) The cover form: a fractional triangle cover of weight at most |P| + εn² exists. (4) Version
+    2, the transfer form used in decomposition theory: every large graph on n vertices that has a
+    fractional triangle decomposition has an edge-disjoint triangle family covering all but at
+    most ηn² edges; it follows from (2), since a fractional decomposition is a fractional packing
+    of weight e(G)/3 and a packing P covers exactly 3|P| edges. The proof of (1)–(3)
     combines a nibble with second-moment and Freedman-type concentration, a low-degree core
     reduction, Mathlib's Szemerédi regularity lemma with a cluster linear program rounded by
     explicit designs, and LP duality.
@@ -33,7 +37,7 @@ sources:
     type: "paper"
     location: "Combinatorica 21 (2001), no. 1, 13–38"
     relationship: "formalizes"
-    note: "Statement (2) is the triangle case of the main theorem (ν*_F(G) − ν_F(G) = o(n²)); the formal proof follows its own route (see the description), not the paper's."
+    note: "Statement (2) is the triangle case of the main theorem (ν*_F(G) − ν_F(G) = o(n²)); the formal proof follows its own route (see the description), not the paper's. Statement (4) (version 2) is the consequence for graphs with a fractional triangle decomposition."
     license: "unknown"
     author_endorsement: "not-contacted"
   - title: "Integer and fractional packing of families of graphs"
@@ -79,6 +83,21 @@ sources:
     license: "unknown"
     author_endorsement: "participated"
 
+  - title: "Clique decompositions of multipartite graphs and completion of Latin squares"
+    authors:
+      - "Ben Barber"
+      - "Daniela Kühn"
+      - "Allan Lo"
+      - "Deryk Osthus"
+      - "Amelia Taylor"
+    id: "doi:10.1016/j.jcta.2017.04.005"
+    type: "paper"
+    location: "Journal of Combinatorial Theory, Series A 151 (2017), 146–201; arXiv:1603.01043"
+    relationship: "background"
+    note: "Theorem 1.5 there states the special case of Haxell–Rödl that statement (4) formalizes for r = 3: a graph with a fractional K_r-decomposition has an η-approximate K_r-decomposition."
+    license: "unknown"
+    author_endorsement: "n/a"
+
 related_formalizations:
   - id: "LeanPool/lean-pool, project AsymptoticTrianglePacking (PRs #544 and #471)"
     relationship: "builds-on"
@@ -92,8 +111,9 @@ related_formalizations:
 status:
   scope: >-
     Proved for every finite vertex type: statement (1) for every uniformity r ≥ 2 and every
-    β > 0; statements (2) and (3) for every ε > 0, uniformly over all finite simple graphs with
-    decidable adjacency on at least n₀(ε) vertices.
+    β > 0; statements (2) and (3) for every ε > 0, and statement (4) (version 2) for every η > 0,
+    uniformly over all finite simple graphs with decidable adjacency on at least n₀ vertices.
+    Only triangles are treated (the general K_r and F cases of Haxell–Rödl are not formalized).
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: []
@@ -121,6 +141,19 @@ automation:
         c55e6e786f49471c72fbddbec5415808896aec1e).
       cost:
         wall_time: "a few hours"
+        spend_usd: "subscription-based"
+        hardware: "local machine"
+      prompting_notes: "Natural-language instructions in Spanish, directed by the author."
+    - method: "agent"
+      models: ["Claude Opus 5.5"]
+      framework: "Claude Code (Anthropic)"
+      tool_setup: >-
+        Version 2: wrote the statement and proof of approx_decomposition_of_fractional in
+        Solution.lean (edge count of a triangle, disjointness of the edge sets of a packing, double
+        counting of a fractional decomposition, and the bound from fractional_triangle_packing_gap
+        with η/3); checked with a local build, #print axioms and the Palomar preflight.
+      cost:
+        wall_time: "about an hour"
         spend_usd: "subscription-based"
         hardware: "local machine"
       prompting_notes: "Natural-language instructions in Spanish, directed by the author."
@@ -154,7 +187,8 @@ review:
     the Frankl–Rödl / Pippenger–Spencer nibble) and recorded the differences above. It checked
     that the vendored modules are the merged Lean Pool sources up to the normalized header lines.
     It wrote and checked the bridges in Solution.lean (realization of ν₃ by an edge-disjoint
-    family, approximation of the infimum τ₃*, weak duality), and confirmed by `lake build`,
+    family, approximation of the infimum τ₃*, weak duality; in version 2 the derivation of the
+    transfer form (4) from (2)), and confirmed by `lake build`,
     `#print axioms` and a comparison of the fully elaborated Challenge and Solution types that
     the proofs use no `sorry` and only propext, Classical.choice and Quot.sound. The author
     directed the work and approved the statements. No independent human mathematical review has
@@ -179,6 +213,11 @@ alignment:
       module: "Challenge"
       status: "proved"
       note: "τ*(G) − ν(G) = o(n²) for triangles, uniformly over finite graphs."
+    - source: "Haxell–Rödl (2001), transfer form for F = K3 (Barber–Kühn–Lo–Osthus–Taylor 2017, Theorem 1.5, r = 3)"
+      lean: "AsymptoticTrianglePacking.approx_decomposition_of_fractional"
+      module: "Challenge"
+      status: "proved"
+      note: "Version 2. A large graph with a fractional triangle decomposition has an edge-disjoint triangle family covering all but ηn² edges."
 
 acknowledgements: >-
   Mathlib and the Lean community; Harmonic's Aristotle; Lean Pool.

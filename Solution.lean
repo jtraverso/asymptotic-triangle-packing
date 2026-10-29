@@ -11,7 +11,7 @@ public import LeanPool.AsymptoticTrianglePacking
 /-!
 # Proofs of the statements in `Challenge.lean`
 
-The definitions below are verbatim copies of those in `Challenge.lean`. The three theorems are
+The definitions below are verbatim copies of those in `Challenge.lean`. The four theorems are
 derived from the library's public theorems:
 
 * `near_regular_nibble` is `LeanPool.AsymptoticTrianglePacking.nearRegularNibbleTheorem`, with the
@@ -23,6 +23,10 @@ derived from the library's public theorems:
   `ε n² / 2` of the infimum exists;
 * `fractional_triangle_packing_gap` follows from the cover statement by weak LP duality
   (`sum_le_of_packing_cover`).
+* `approx_decomposition_of_fractional` (version 2) follows from `fractional_triangle_packing_gap`
+  with `η / 3`: a fractional triangle decomposition is a fractional packing of total weight
+  `e(G) / 3` (`three_mul_sum_eq_card`), and the triangles of a packing `P` cover exactly `3 |P|`
+  edges.
 -/
 
 @[expose] public section
@@ -53,6 +57,12 @@ every triangle `t` of `G`, the edges of `G` inside `t` have total weight at leas
 def IsFracTriangleCover {V : Type*} [Fintype V] [DecidableEq V] (G : SimpleGraph V)
     [DecidableRel G.Adj] (y : Sym2 V → ℝ) : Prop :=
   (∀ e, 0 ≤ y e) ∧ ∀ t ∈ G.cliqueFinset 3, 1 ≤ ∑ e ∈ edgesIn G t, y e
+
+/-- A fractional triangle decomposition of `G`: nonnegative weights on vertex sets such that, for
+every edge `e` of `G`, the triangles of `G` containing `e` have total weight exactly one. -/
+def IsFracTriangleDecomp {V : Type*} [Fintype V] [DecidableEq V] (G : SimpleGraph V)
+    [DecidableRel G.Adj] (w : Finset V → ℝ) : Prop :=
+  (∀ t, 0 ≤ w t) ∧ ∀ e ∈ G.edgeFinset, ∑ t ∈ G.cliqueFinset 3 with e ∈ edgesIn G t, w t = 1
 
 /-- **A finite near-regular nibble theorem.** Uniform hypergraphs whose degrees are at most
 `(1 + μ) d` everywhere and at least `(1 - μ) d` outside a set of at most `η |V|` vertices, and whose
@@ -195,5 +205,100 @@ theorem fractional_triangle_packing_gap (ε : ℝ) (hε : 0 < ε) :
   refine ⟨n₀, fun V _ _ G _ hn => ?_⟩
   obtain ⟨P, y, hP, hy, hval⟩ := hn₀ V G hn
   exact ⟨P, hP, fun w hw => (sum_le_of_packing_cover G hw hy).trans hval⟩
+
+/-- The edges of `G` inside `t` are edges of `G`. -/
+theorem edgesIn_subset {V : Type*} [Fintype V] [DecidableEq V] (G : SimpleGraph V)
+    [DecidableRel G.Adj] (t : Finset V) : edgesIn G t ⊆ G.edgeFinset :=
+  Finset.filter_subset _ _
+
+/-- A triangle of `G` contains exactly three edges of `G`. -/
+theorem card_edgesIn_of_mem_cliqueFinset {V : Type*} [Fintype V] [DecidableEq V]
+    (G : SimpleGraph V) [DecidableRel G.Adj] {t : Finset V} (ht : t ∈ G.cliqueFinset 3) :
+    #(edgesIn G t) = 3 := by
+  rw [mem_cliqueFinset_iff, is3Clique_iff] at ht
+  obtain ⟨a, b, c, hab, hac, hbc, rfl⟩ := ht
+  have hne : a ≠ b ∧ a ≠ c ∧ b ≠ c := ⟨hab.ne, hac.ne, hbc.ne⟩
+  have heq : edgesIn G {a, b, c} = {s(a, b), s(a, c), s(b, c)} := by
+    ext e
+    induction e using Sym2.ind with
+    | _ x y =>
+      simp only [edgesIn, mem_filter, mem_edgeFinset, mem_edgeSet, Sym2.mem_iff, forall_eq_or_imp,
+        forall_eq, mem_insert, mem_singleton, Sym2.eq_iff]
+      constructor
+      · rintro ⟨hxy, hx, hy⟩
+        have := hxy.ne
+        rcases hx with rfl | rfl | rfl <;> rcases hy with rfl | rfl | rfl <;> simp_all
+      · rintro (⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩) <;>
+          simp_all [G.adj_symm]
+  rw [heq]
+  obtain ⟨h1, h2, h3⟩ := hne
+  rw [card_insert_of_notMem, card_insert_of_notMem, card_singleton]
+  · simp [h1, h2, h3.symm]
+  · simp [h1, h2, h3, h1.symm]
+
+/-- The triangles of a triangle packing have pairwise disjoint edge sets. -/
+theorem disjoint_edgesIn_of_packing {V : Type*} [Fintype V] [DecidableEq V]
+    (G : SimpleGraph V) [DecidableRel G.Adj] {P : Finset (Finset V)} (hP : IsTrianglePacking G P) :
+    (P : Set (Finset V)).PairwiseDisjoint (edgesIn G) := by
+  intro s hs t ht hst
+  refine Finset.disjoint_left.2 fun e hes het => ?_
+  induction e using Sym2.ind with
+  | _ x y =>
+    simp only [edgesIn, mem_filter, mem_edgeFinset, mem_edgeSet, Sym2.mem_iff, forall_eq_or_imp,
+      forall_eq] at hes het
+    have hxy : x ≠ y := hes.1.ne
+    have h2 : ({x, y} : Finset V) ⊆ s ∩ t := by
+      intro v hv
+      simp only [mem_insert, mem_singleton] at hv
+      rcases hv with rfl | rfl
+      · exact mem_inter.2 ⟨hes.2.1, het.2.1⟩
+      · exact mem_inter.2 ⟨hes.2.2, het.2.2⟩
+    have := card_le_card h2
+    rw [card_pair hxy] at this
+    have := hP.2 s hs t ht hst
+    omega
+
+/-- Double counting: for a fractional triangle decomposition, `3 ∑ w = e(G)`. -/
+theorem three_mul_sum_eq_card {V : Type*} [Fintype V] [DecidableEq V] (G : SimpleGraph V)
+    [DecidableRel G.Adj] {w : Finset V → ℝ} (hw : IsFracTriangleDecomp G w) :
+    3 * ∑ t ∈ G.cliqueFinset 3, w t = (#G.edgeFinset : ℝ) := by
+  calc 3 * ∑ t ∈ G.cliqueFinset 3, w t
+      = ∑ t ∈ G.cliqueFinset 3, ∑ e ∈ G.edgeFinset, if e ∈ edgesIn G t then w t else 0 := by
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl fun t ht => ?_
+        rw [Finset.sum_ite_mem, Finset.inter_eq_right.2 (edgesIn_subset G t), Finset.sum_const,
+          card_edgesIn_of_mem_cliqueFinset G ht]
+        simp [mul_comm]
+    _ = ∑ e ∈ G.edgeFinset, ∑ t ∈ G.cliqueFinset 3 with e ∈ edgesIn G t, w t := by
+        rw [Finset.sum_comm]
+        refine Finset.sum_congr rfl fun e _ => ?_
+        rw [Finset.sum_filter]
+    _ = ∑ e ∈ G.edgeFinset, (1 : ℝ) := Finset.sum_congr rfl fun e he => hw.2 e he
+    _ = (#G.edgeFinset : ℝ) := by simp
+
+/-- **Haxell–Rödl, transfer form, for triangles.** For every `η > 0`, every large enough finite
+graph `G` on `n` vertices that has a fractional triangle decomposition has an edge-disjoint triangle
+family covering all edges of `G` except at most `η n²`. -/
+theorem approx_decomposition_of_fractional (η : ℝ) (hη : 0 < η) :
+    ∃ n₀ : ℕ, ∀ (V : Type) [Fintype V] [DecidableEq V] (G : SimpleGraph V) [DecidableRel G.Adj],
+      n₀ ≤ Fintype.card V → (∃ w : Finset V → ℝ, IsFracTriangleDecomp G w) →
+        ∃ P : Finset (Finset V), IsTrianglePacking G P ∧
+          (#(G.edgeFinset \ P.biUnion (edgesIn G)) : ℝ) ≤ η * (Fintype.card V : ℝ) ^ 2 := by
+  obtain ⟨n₀, h⟩ := fractional_triangle_packing_gap (η / 3) (by positivity)
+  refine ⟨n₀, fun V _ _ G _ hn ⟨w, hw⟩ => ?_⟩
+  obtain ⟨P, hP, hgap⟩ := h V G hn
+  refine ⟨P, hP, ?_⟩
+  have h1 := hgap w ⟨hw.1, fun e he => (hw.2 e he).le⟩
+  have h2 := three_mul_sum_eq_card G hw
+  have hsub : P.biUnion (edgesIn G) ⊆ G.edgeFinset :=
+    Finset.biUnion_subset.2 fun t _ => edgesIn_subset G t
+  have hcov : #(P.biUnion (edgesIn G)) = 3 * #P := by
+    rw [card_biUnion (disjoint_edgesIn_of_packing G hP), Finset.sum_congr rfl
+      fun t ht => card_edgesIn_of_mem_cliqueFinset G (hP.1 ht), Finset.sum_const, smul_eq_mul,
+      mul_comm]
+  have h3 := card_sdiff_add_card_eq_card hsub
+  have h4 : (#(G.edgeFinset \ P.biUnion (edgesIn G)) : ℝ) + 3 * #P = #G.edgeFinset := by
+    exact_mod_cast hcov ▸ h3
+  nlinarith
 
 end AsymptoticTrianglePacking

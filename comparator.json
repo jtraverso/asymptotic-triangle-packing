@@ -4,9 +4,14 @@
   "theorem_names": [
     "AsymptoticTrianglePacking.near_regular_nibble",
     "AsymptoticTrianglePacking.fractional_triangle_packing_gap",
-    "AsymptoticTrianglePacking.triangle_cover_packing_gap"
+    "AsymptoticTrianglePacking.triangle_cover_packing_gap",
+    "AsymptoticTrianglePacking.approx_decomposition_of_fractional"
   ],
   "definition_names": [],
-  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
   "enable_nanoda": true
 }
